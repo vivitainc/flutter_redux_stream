@@ -1,0 +1,25 @@
+.gitattributes text eol=lf
+.gitignore text eol=lf
+*.a binary
+*.aidl text eol=lf
+*.bat text eol=crlf
+*.bin binary
+*.dart text eol=lf
+*.dockerfile text eol=lf
+*.gradle text eol=lf
+*.jar binary
+*.java text eol=lf
+*.jks binary
+*.kt text eol=lf
+*.md text eol=lf
+*.png binary
+*.pro text eol=lf
+*.properties text=auto
+*.rb text eol=lf
+*.sh text eol=lf
+*.so binary
+*.txt text eol=lf
+*.xml text eol=lf
+Dockerfile text eol=lf
+gradlew text=auto
+gradlew.bat text=auto

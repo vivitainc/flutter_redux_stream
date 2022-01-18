@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "flutter > clean",
+            "type": "shell",
+            "command": "./gradlew --parallel --stacktrace  flutterCacheClean flutterClean",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > pub upgrade",
+            "type": "shell",
+            "command": "./gradlew --stacktrace flutterPubUpgrade",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > pub upgrade(--offline)",
+            "type": "shell",
+            "command": "./gradlew --stacktrace -Pflutter.offline flutterPubUpgrade",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > format",
+            "type": "shell",
+            "command": "./gradlew --parallel --stacktrace  flutterFormat",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > analyze",
+            "type": "shell",
+            "command": "./gradlew --parallel --stacktrace flutterAnalyze",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > build runner",
+            "type": "shell",
+            "command": "./gradlew --stacktrace flutterBuildRunner",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > compile proto3",
+            "type": "shell",
+            "command": "./gradlew --parallel --stacktrace flutterCompileProto3",
+            "problemMatcher": []
+        },
+        {
+            "label": "flutter > Run Unit Test",
+            "type": "shell",
+            "command": "./gradlew flutterTest",
+            "problemMatcher": [],
+        },
+    ]
+}

@@ -1,0 +1,31 @@
+name: flutter_redux_stream
+description: Redux Architecture for Flutter 2.0
+version: 0.0.1
+homepage: https://github.com/vivitainc/flutter_redux_stream
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+environment:
+  sdk: ">=2.15.1 <3.0.0"
+  flutter: ">=2.8.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  rxdart: ^0.27.2
+  provider: ^6.0.0
+  stdlib_plus:
+    git:
+      url: https://github.com/vivitainc/flutter_stdlib_plus.git
+      ref: b99d625125b82f0d5c10e38da525405f0681001a
+  async_plus:
+    git:
+      url: https://github.com/vivitainc/flutter_async_plus.git
+      ref: 69870c965562a454eadcb07750c59e5a749d5b32
+  logger: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.3
+
+flutter:

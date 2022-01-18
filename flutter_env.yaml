@@ -1,0 +1,4 @@
+# for Test Environments.
+dart.flutterAdditionalArgs:
+  unit_test:
+    BUILD_WITH_FLUTTER_ENV: true

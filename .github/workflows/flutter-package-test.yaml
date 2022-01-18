@@ -1,0 +1,58 @@
+name: "Flutter: Package testing"
+on:
+  push:
+jobs:
+  flutter-library-test:
+    name: "Flutter: Package testing"
+    runs-on: ubuntu-20.04
+    if: contains(github.event.head_commit.message, '[ci skip]') == false && contains(github.event.head_commit.message, 'wip:') == false
+    env:
+      _JAVA_OPTIONS: "-Xmx4g -Dfile.encoding=UTF-8"
+      TZ: Asia/Tokyo
+      FLUTTER_CHANNEL: "stable"
+      FLUTTER_VERSION: "2.8.1"
+      FLUTTER_INSTALL_PATH: /opt/hostedtoolcache/flutter
+    steps:
+      - uses: actions/checkout@v2.0.0
+      - name: "environments / java11"
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: "environments / flutter"
+        uses: subosito/flutter-action@v1
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      - name: "cache / gradle"
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/pubspec.yaml') }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/cache-version.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: "cache / dart"
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.FLUTTER_INSTALL_PATH }}/${{ env.FLUTTER_VERSION }}-${{env.FLUTTER_CHANNEL }}/x64/.pub-cache
+          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}-${{ hashFiles('**/cache-version.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-dart-
+      - name: "environments"
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "PWD=$PWD"
+          echo "java `java -version`: `which java`"
+          echo "gradle=`which gradle`"
+          echo "flutter=`which flutter`"
+          echo "dart=`which dart`"
+          flutter doctor
+          ls -al
+          chmod +x ./gradlew
+      - name: "flutter / pub upgrade"
+        run: ./gradlew flutterPubUpgrade
+      - name: "flutter / format"
+        run: ./gradlew flutterValidateFormat
+      - name: "flutter / analyze"
+        run: ./gradlew flutterAnalyze
+      - name: "flutter / test"
+        run: ./gradlew flutterTest
