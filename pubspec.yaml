@@ -16,11 +16,11 @@ dependencies:
   stdlib_plus:
     git:
       url: https://github.com/vivitainc/flutter_stdlib_plus.git
-      ref: b99d625125b82f0d5c10e38da525405f0681001a
+      ref: 0.0.1
   async_plus:
     git:
       url: https://github.com/vivitainc/flutter_async_plus.git
-      ref: 69870c965562a454eadcb07750c59e5a749d5b32
+      ref: 0.0.1
   logger: ^1.0.0
 
 dev_dependencies:
