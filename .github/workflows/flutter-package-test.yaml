@@ -19,8 +19,9 @@ jobs:
         with:
           java-version: 11
       - name: "environments / flutter"
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
+          cache: true
           channel: ${{ env.FLUTTER_CHANNEL }}
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - name: "cache / gradle"
