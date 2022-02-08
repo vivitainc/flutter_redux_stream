@@ -5,7 +5,7 @@ import 'multi_source_redux_property_buffer_mixin.dart';
 ///
 /// NOTE.
 /// [MultiSourceReduxPropertyBufferMixin] オブジェクトはコンストラクタとして与えるか、
-/// もしくはMiddlewareとして登録されている必要がある.
+/// もしくはPluginとして登録されている必要がある.
 abstract class MultiSourceReduxAction<TState extends ReduxState>
     extends ReduxAction<TState> {
   final MultiSourceReduxPropertyBufferMixin<TState>? _buffer;
@@ -17,7 +17,7 @@ abstract class MultiSourceReduxAction<TState extends ReduxState>
   /// ReduxStore更新処理を生成する.
   ///
   /// 事前・事後処理はオプションであり、基本的には [onExecute] のみ指定すれば良い.
-  /// [buffer] がnullである場合、ReduxStore.middleware()を通じて自動的に取得する.
+  /// [buffer] がnullである場合、ReduxStore.plugin()を通じて自動的に取得する.
   factory MultiSourceReduxAction.update({
     MultiSourceReduxPropertyBufferMixin<TState>? buffer,
     Stream<TState> Function(TState state)? onPreExecute,
@@ -43,8 +43,7 @@ abstract class MultiSourceReduxAction<TState extends ReduxState>
 
   /// Sourceバッファへアクセスする.
   MultiSourceReduxPropertyBufferMixin<TState> get buffer =>
-      _buffer ??
-      store.middleware<MultiSourceReduxPropertyBufferMixin<TState>>();
+      _buffer ?? store.plugin<MultiSourceReduxPropertyBufferMixin<TState>>();
 
   @override
   Stream<TState> execute(final TState state) async* {

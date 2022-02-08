@@ -1,14 +1,14 @@
 import 'package:rxdart/rxdart.dart';
 
-import '../redux_middleware.dart';
+import '../redux_plugin.dart';
 import '../redux_store.dart';
 import 'multi_source_redux_action.dart';
 import 'multi_source_redux_property_buffer_mixin.dart';
 
 /// [MultiSourceReduxPropertyBufferMixin] および [MultiSourceReduxPropertyBufferMixin] を
-/// 簡潔に扱えるようにラップするMiddleware.
-class MultiSourceBufferMiddleware<TState extends ReduxState>
-    extends ReduxMiddleware<TState>
+/// 簡潔に扱えるようにラップするPlugin.
+class MultiSourceBufferPlugin<TState extends ReduxState>
+    extends ReduxPlugin<TState>
     with MultiSourceReduxPropertyBufferMixin<TState> {
   ReduxStore<TState>? _store;
 

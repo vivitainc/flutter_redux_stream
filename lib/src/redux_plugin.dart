@@ -5,10 +5,9 @@ import 'redux_store.dart';
 /// Redux Storeの各種タイミングでハンドリングを行う.
 ///
 /// Actionとは違い、非同期処理やStateを変更することはできない.
-/// ReduxStore.dispose()の呼び出し時にReduxMiddleware.dispose()が実行される.
-abstract class ReduxMiddleware<TState extends ReduxState>
-    implements Disposable {
-  /// StoreへMiddlewareが登録された.
+/// ReduxStore.dispose()の呼び出し時にReduxPlugin.dispose()が実行される.
+abstract class ReduxPlugin<TState extends ReduxState> implements Disposable {
+  /// StoreへPluginが登録された.
   void onRegistered(ReduxStore<TState> store) {}
 
   /// StoreへDispatch命令が発行された.

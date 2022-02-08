@@ -1,13 +1,16 @@
 import 'dart:collection';
 
 import '../redux_store.dart';
+import 'multi_source_buffer_plugin.dart';
+import 'multi_source_redux_action.dart';
 
 /// 複数のStateをマージするためのHelper Class.
 ///
 /// 分割されたStateはBufferにキューイングされ、適切にマージされる.
 /// Actionを通じて実際のStateに反映される.
 ///
-/// MiddlewareにMixinすることでActionからアクセスでき、分離したPropertyのマージを行うことができる.
+/// [MultiSourceBufferPlugin] と [MultiSourceReduxAction] を使用するとActionからアクセスでき、
+/// 分離したPropertyのマージを行うことができる.
 mixin MultiSourceReduxPropertyBufferMixin<TState extends ReduxState> {
   /// マージ対象のプロパティリスト.
   final _queue = Queue<_StateOperator>();

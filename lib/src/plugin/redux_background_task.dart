@@ -1,7 +1,7 @@
 import 'package:stdlib_plus/stdlib_plus.dart';
 
 import '../redux_store.dart';
-import 'redux_background_task_middleware.dart';
+import 'redux_background_task_plugin.dart';
 
 /// ReduxStoreのBackground処理を行う.
 /// これは処理の分割やPlugin等の細かい処理を挿入するための用意されており、
@@ -29,9 +29,9 @@ abstract class ReduxBackgroundTask<TState extends ReduxState>
   /// BackgroundTaskの処理を開始させる
   void onStart(TState state);
 
-  /// Middlewareの動作リストに登録する
-  void registerToMiddleware() {
-    final mw = store.middleware<ReduxBackgroundTaskMiddleware<TState>>();
+  /// Pluginの動作リストに登録する
+  void registerToPlugin() {
+    final mw = store.plugin<ReduxBackgroundTaskPlugin<TState>>();
     store.dispatch(_RegisterBackgroundTask(mw, this));
   }
 }
@@ -40,13 +40,13 @@ class _RegisterBackgroundTask<TState extends ReduxState>
     extends ReduxAction<TState> {
   final ReduxBackgroundTask<TState> _task;
 
-  final ReduxBackgroundTaskMiddleware<TState> _middleware;
+  final ReduxBackgroundTaskPlugin<TState> _plugin;
 
-  _RegisterBackgroundTask(this._middleware, this._task);
+  _RegisterBackgroundTask(this._plugin, this._task);
 
   @override
   Stream<TState> execute(TState state) async* {
     _task.onStart(state);
-    _middleware.addTask(_task);
+    _plugin.addTask(_task);
   }
 }

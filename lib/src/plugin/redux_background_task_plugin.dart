@@ -1,10 +1,10 @@
-import '../redux_middleware.dart';
+import '../redux_plugin.dart';
 import '../redux_store.dart';
 import 'redux_background_task.dart';
 
 /// ReduxStoreのBackground動作を行う.
-class ReduxBackgroundTaskMiddleware<TState extends ReduxState>
-    extends ReduxMiddleware<TState> {
+class ReduxBackgroundTaskPlugin<TState extends ReduxState>
+    extends ReduxPlugin<TState> {
   final _taskList = <ReduxBackgroundTask<TState>>{};
 
   /// 実行対象のタスクを追加する

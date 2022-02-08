@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:stdlib_plus/stdlib_plus.dart';
 
-import 'middleware/notify_redux_property_middleware.dart';
+import 'plugin/notify_redux_property_plugin.dart';
 import 'redux_store.dart';
 
 /// ReduxStateの特定プロパティが変更された際のハンドリングを行う.
@@ -80,12 +80,17 @@ class ReduxPropertyNotifier<TState extends ReduxState, T>
         _onPropertyCleared = onPropertyCleared,
         _onDispose = onDispose;
 
+  @override
+  void dispose() {
+    _onDispose?.call(_latestState!, _latestProperty);
+  }
+
   /// プロパティの更新ハンドリングを行う.
   void onStateChanged(TState newState) {
     final oldState = _latestState;
     final oldProperty = _latestProperty;
 
-    final newProperty = newState.select(selector);
+    final newProperty = selector(newState);
     _latestState = newState;
     _latestProperty = newProperty;
 
@@ -122,24 +127,19 @@ class ReduxPropertyNotifier<TState extends ReduxState, T>
       return a == b;
     }
   }
-
-  @override
-  void dispose() {
-    _onDispose?.call(_latestState!, _latestProperty);
-  }
 }
 
 extension ReduxPropertyNotifierExtension<TState extends ReduxState>
     on ReduxStore<TState> {
   /// Notifierを [ReduxStore] へ登録する
   void addNotifier<T>(ReduxPropertyNotifier<TState, T> notifier) {
-    final mw = middleware<NotifyReduxPropertyMiddleware<TState, T>>();
-    mw.addNotifier(notifier);
+    final ob = plugin<NotifyReduxPropertyPlugin<TState, T>>();
+    ob.addNotifier(notifier);
   }
 
   /// Notifierを [ReduxStore] から削除する
   void removeNotifier<T>(ReduxPropertyNotifier<TState, T> notifier) {
-    final mw = middleware<NotifyReduxPropertyMiddleware<TState, T>>();
-    mw.removeNotifier(notifier);
+    final ob = plugin<NotifyReduxPropertyPlugin<TState, T>>();
+    ob.removeNotifier(notifier);
   }
 }

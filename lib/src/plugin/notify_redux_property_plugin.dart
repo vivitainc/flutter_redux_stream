@@ -1,4 +1,4 @@
-import '../redux_middleware.dart';
+import '../redux_plugin.dart';
 import '../redux_property_notifier.dart';
 import '../redux_store.dart';
 
@@ -6,8 +6,8 @@ import '../redux_store.dart';
 ///
 /// NOTE:
 /// 登録されているNotifierへの通知は順不同で行われる.
-class NotifyReduxPropertyMiddleware<TState extends ReduxState, T>
-    extends ReduxMiddleware<TState> {
+class NotifyReduxPropertyPlugin<TState extends ReduxState, T>
+    extends ReduxPlugin<TState> {
   final _pendingNotifier = <_PendingNotifier<TState, T>>[];
 
   /// 登録されているNotifier.

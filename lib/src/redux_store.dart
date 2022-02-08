@@ -8,7 +8,7 @@ import 'package:stdlib_plus/stdlib_plus.dart';
 
 import 'experimental/redux_action_hook.dart';
 import 'internal/logger.dart';
-import 'redux_middleware.dart';
+import 'redux_plugin.dart';
 
 part 'dispatcher.dart';
 part 'redux_action.dart';
@@ -31,7 +31,7 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
 
   late Dispatcher<TState> _dispatcher;
 
-  final List<ReduxMiddleware<TState>> _middlewareList = [];
+  final List<ReduxPlugin<TState>> _pluginList = [];
 
   final List<ReduxActionHook<TState>> _hookList = [];
 
@@ -63,7 +63,7 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
   /// この処理はFire & Forgetのため、終了を待ち合わせることはできない.
   void dispatch(ReduxAction<TState> action) {
     action._store = this;
-    for (final element in _middlewareList) {
+    for (final element in _pluginList) {
       element.onDispatch(this, action, state);
     }
     _dispatcher.dispatch(action);
@@ -120,7 +120,7 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
   @override
   void dispose() {
     _notifier.dispose();
-    _middlewareList
+    _pluginList
       ..forEach((element) {
         element
           ..onUnregistered(this)
@@ -142,18 +142,18 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
   /// 実行待ち、もしくは実行中のActionがあればtrueを返却する.
   bool hasActions() => _dispatcher.hasActions();
 
-  /// 指定Middlewareを取得する.
-  /// 指定型のMiddlewareが見つからない場合、このメソッドは例外を投げる.
-  TMiddleware middleware<TMiddleware>() {
-    final itr = _middlewareList.whereType<TMiddleware>();
-    check(itr.isNotEmpty, () => 'Invalid Middleware<$TMiddleware>');
+  /// 指定Pluginを取得する.
+  /// 指定型のPluginが見つからない場合、このメソッドは例外を投げる.
+  TPlugin plugin<TPlugin>() {
+    final itr = _pluginList.whereType<TPlugin>();
+    check(itr.isNotEmpty, () => 'Invalid Plugin<$TPlugin>');
     return itr.first;
   }
 
-  /// 指定Middlewareを取得する.
-  /// 指定型のMiddlewareが見つからない場合、このメソッドは例外を投げる.
-  TMiddleware? middlewareOrNull<TMiddleware>() {
-    final itr = _middlewareList.whereType<TMiddleware>();
+  /// 指定Pluginを取得する.
+  /// 指定型のPluginが見つからない場合、このメソッドは例外を投げる.
+  TPlugin? pluginOrNull<TPlugin>() {
+    final itr = _pluginList.whereType<TPlugin>();
     if (itr.isEmpty) {
       return null;
     }
@@ -169,19 +169,19 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
     hook.onRegistered(this);
   }
 
-  /// MiddlewareをStoreへ登録する.
-  void registerMiddleware(ReduxMiddleware<TState> middleware) {
-    assert(!_middlewareList.contains(middleware), 'middleware is registered');
+  /// PluginをStoreへ登録する.
+  void registerPlugin(ReduxPlugin<TState> plugin) {
+    assert(!_pluginList.contains(plugin), 'plugin is registered');
 
-    _middlewareList.add(middleware);
-    middleware.onRegistered(this);
+    _pluginList.add(plugin);
+    plugin.onRegistered(this);
   }
 
-  /// 指定型と条件に一致するMiddlewareを検索する
-  TMiddleware whereMiddleware<TMiddleware>(
-      bool Function(ReduxMiddleware<TState> element) test) {
-    final itr = _middlewareList.where(test).whereType<TMiddleware>();
-    check(itr.isNotEmpty, () => 'Invalid Middleware<$TMiddleware>');
+  /// 指定型と条件に一致するPluginを検索する
+  TPlugin wherePlugin<TPlugin>(
+      bool Function(ReduxPlugin<TState> element) test) {
+    final itr = _pluginList.where(test).whereType<TPlugin>();
+    check(itr.isNotEmpty, () => 'Invalid Plugin<$TPlugin>');
     return itr.first;
   }
 
@@ -193,7 +193,7 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
     }
     final oldState = state;
 
-    // Middlewareに値の正規化を行わせる.
+    // Hookに値の正規化を行わせる.
     var newState = rawNewState;
     for (final element in _hookList) {
       newState = element.shouldStateChange(
@@ -214,7 +214,7 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
       newState,
     ));
     _notifyNumber++;
-    for (final element in _middlewareList) {
+    for (final element in _pluginList) {
       element.onStateChanged(
         this,
         action,
