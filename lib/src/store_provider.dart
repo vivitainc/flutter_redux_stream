@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -7,7 +9,8 @@ import 'redux_store.dart';
 typedef StoreCreate<T extends ReduxState> = ReduxStore<T> Function(
     BuildContext context);
 
-typedef StoreDispose<T extends ReduxState> = void Function(ReduxStore<T> store);
+typedef StoreDispose<T extends ReduxState> = Future Function(
+    ReduxStore<T> store);
 
 typedef WidgetBuilder<T extends ReduxState> = Widget Function(
   BuildContext context,
@@ -43,9 +46,9 @@ class StoreProvider<TState extends ReduxState> extends StatelessWidget {
       create: (context) => create(context),
       dispose: (_, value) {
         if (storeDispose != null) {
-          storeDispose!(value);
+          unawaited(storeDispose!(value));
         } else {
-          value.dispose();
+          unawaited(value.dispose());
         }
       },
       builder: (context, child) {

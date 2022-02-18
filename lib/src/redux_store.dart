@@ -21,7 +21,7 @@ part 'redux_state_notify.dart';
 /// Storeは配下に持つReducer等のライフサイクルも管理する.
 /// Store.dispose()されたタイミングでLifecycle.onDestroy()が実行され、
 /// 非同期処理等が逐次キャンセルされる.
-class ReduxStore<TState extends ReduxState> implements Disposable {
+class ReduxStore<TState extends ReduxState> {
   final _notifier = Notify();
 
   final BehaviorSubject<TState> _state;
@@ -116,10 +116,16 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
   }
 
   /// Storeの終了処理を行う
+  ///
+  /// NOTE.
+  /// Task実行中のState不全を避けるため、Disposeは非同期で行われる.
+  /// 最低限、現在 [dispatch] に積まれている処理は全て処理され、
+  /// その後終了処理が実行される.
   @mustCallSuper
-  @override
-  void dispose() {
-    _notifier.dispose();
+  Future dispose() async {
+    final task = dispatchAndResult(_FinalizeAction());
+    await task;
+    assert(_notifier.isClosed, '!Notifier.isClosed');
     _pluginList
       ..forEach((element) {
         element
@@ -134,9 +140,9 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
           ..dispose();
       })
       ..clear();
-    _notifyEvent.close();
+    unawaited(_notifyEvent.close());
     _dispatcher.dispose();
-    _state.close();
+    unawaited(_state.close());
   }
 
   /// 実行待ち、もしくは実行中のActionがあればtrueを返却する.
@@ -223,5 +229,12 @@ class ReduxStore<TState extends ReduxState> implements Disposable {
       );
     }
     _notifier.notify(); // 通知待ちオブジェクトに処理を継続させる.
+  }
+}
+
+class _FinalizeAction<TState extends ReduxState> extends ReduxAction<TState> {
+  @override
+  Stream<TState> execute(TState state) async* {
+    store._notifier.dispose();
   }
 }
