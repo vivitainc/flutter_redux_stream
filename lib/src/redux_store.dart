@@ -35,13 +35,20 @@ class ReduxStore<TState extends ReduxState> {
 
   final List<ReduxActionHook<TState>> _hookList = [];
 
+  /// State解放関数
+  final ReduxStateDispose<TState>? _stateDispose;
+
   /// 通知番号
   /// Initialを除き、データが更新されるタイミングで発行される.
   var _notifyNumber = 0;
 
+  /// 指定された初期値でReduxStoreを生成する.
+  /// Stateの解放処理を明示的に記述したい場合、 [stateDispose] を設定する.
   ReduxStore({
     required TState initial,
-  }) : _state = BehaviorSubject.seeded(initial) {
+    ReduxStateDispose<TState>? stateDispose,
+  })  : _stateDispose = stateDispose,
+        _state = BehaviorSubject.seeded(initial) {
     _dispatcher = Dispatcher(_notifier);
     _dispatcher._start(this);
   }
@@ -132,6 +139,8 @@ class ReduxStore<TState extends ReduxState> {
       // Notifierが閉じるのを待つ.
     }
     assert(_notifier.isClosed, '!Notifier.isClosed');
+
+    final latestState = state;
     _pluginList
       ..forEach((element) {
         element
@@ -146,9 +155,14 @@ class ReduxStore<TState extends ReduxState> {
           ..dispose();
       })
       ..clear();
-    unawaited(_notifyEvent.close());
+    await _notifyEvent.close();
     _dispatcher.dispose();
-    unawaited(_state.close());
+    await _state.close();
+
+    if (_stateDispose != null) {
+      // カスタムDisposeに解放処理を行わせる
+      await _stateDispose!(latestState);
+    }
   }
 
   /// 実行待ち、もしくは実行中のActionがあればtrueを返却する.

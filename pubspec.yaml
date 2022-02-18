@@ -1,6 +1,6 @@
 name: redux_stream
 description: Redux Architecture for Flutter 2.0
-version: 0.1.1+1
+version: 0.1.2
 homepage: https://github.com/vivitainc/flutter_redux_stream
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
