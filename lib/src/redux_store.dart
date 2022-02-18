@@ -123,8 +123,14 @@ class ReduxStore<TState extends ReduxState> {
   /// その後終了処理が実行される.
   @mustCallSuper
   Future dispose() async {
-    final task = dispatchAndResult(_FinalizeAction());
-    await task;
+    dispatch(_FinalizeAction());
+    try {
+      while (!_notifier.isClosed) {
+        await _notifier.wait();
+      }
+    } on CancellationException catch (_) {
+      // Notifierが閉じるのを待つ.
+    }
     assert(_notifier.isClosed, '!Notifier.isClosed');
     _pluginList
       ..forEach((element) {
