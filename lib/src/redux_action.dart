@@ -21,6 +21,20 @@ abstract class ReduxAction<TState extends ReduxState> {
   ReduxStore<TState> get store => _store;
 
   Stream<TState> execute(TState state);
+
+  /// Action内で別なActionを実行する.
+  /// 他のActionを使い回すなどの利用方法がある.
+  /// ただし、引数 [action] は使用済みとなるため、再利用はできない.
+  Stream<TState> delegate(ReduxAction<TState> action, TState state) async* {
+    assert(action._state == _ActionState.pending, 'Invalid state, $action');
+    try {
+      action._state = _ActionState.execute;
+      action._store = _store;
+      yield* action.execute(state);
+    } finally {
+      action._state = _ActionState.done;
+    }
+  }
 }
 
 enum _ActionState {
