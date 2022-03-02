@@ -15,6 +15,9 @@ mixin MultiSourceReduxPropertyBufferMixin<TState extends ReduxState> {
   /// マージ対象のプロパティリスト.
   final _queue = Queue<_StateOperator>();
 
+  /// バッファを持っていればtrue.
+  bool get isEmpty => _queue.isEmpty;
+
   /// 登録順を守り、キューが空になるまで順にマージするStreamを生成する.
   /// Stateの切り替わりをトレースする必要があるため、Stateのスキップ/フィルタリングは行わない.
   Stream<TState> merge(TState state) {
@@ -44,6 +47,17 @@ mixin MultiSourceReduxPropertyBufferMixin<TState extends ReduxState> {
     await for (final newState in merge(copied)) {
       copied = newState;
       yield copied;
+    }
+  }
+
+  /// Bufferにオブジェクトが存在すればマージして新たなStateを返却し、
+  /// そうでないなら [state] をそのまま返却する.
+  TState pop(TState state) {
+    final operator = _pop();
+    if (operator == null) {
+      return state;
+    } else {
+      return operator.run(state) as TState;
     }
   }
 
