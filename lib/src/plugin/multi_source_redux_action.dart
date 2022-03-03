@@ -79,13 +79,13 @@ abstract class MultiSourceReduxAction<TState extends ReduxState>
   Stream<TState> onExecute(TState state);
 
   /// 事後処理
-  Stream<TState> onPostExecute(TState state);
+  Stream<TState> onPostExecute(TState state) => const Stream.empty();
 
   /// 事後統合処理進捗
   Future onPostMerge(TState state) => Future<void>.value(null);
 
   /// 事前処理
-  Stream<TState> onPreExecute(TState state);
+  Stream<TState> onPreExecute(TState state) => const Stream.empty();
 
   /// 事前統合処理進捗
   Future onPreMerge(TState state) => Future<void>.value(null);
