@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../redux_plugin.dart';
@@ -10,23 +13,19 @@ import 'multi_source_redux_property_buffer_mixin.dart';
 class MultiSourceBufferPlugin<TState extends ReduxState>
     extends ReduxPlugin<TState>
     with MultiSourceReduxPropertyBufferMixin<TState> {
-  ReduxStore<TState>? _store;
+  @protected
+  ReduxStore<TState>? store;
 
   final _subscription = CompositeSubscription();
 
   /// Streamからデータを受け取り、Storeへとマージする.
   /// StreamはReduxStoreのライフサイクル終了時に自動的に解放される.
-  void addStreamSource<T>(
+  StreamSubscription<T> addStreamSource<T>(
     Stream<T> source,
     TState Function(TState state, T value) merge,
   ) {
-    _subscription.add(source.listen((event) {
-      push<T>(event, merge: merge);
-      final store = _store;
-      if (store != null && !store.hasActions()) {
-        // 実行中のActionがなければマージを促す
-        store.dispatch(MultiSourceReduxAction.merge());
-      }
+    return _subscription.add(source.listen((event) {
+      pushWithMerge(event, merge: merge);
     }));
   }
 
@@ -37,6 +36,20 @@ class MultiSourceBufferPlugin<TState extends ReduxState>
 
   @override
   void onRegistered(ReduxStore<TState> store) {
-    _store = store;
+    this.store = store;
+  }
+
+  /// Bufferへ値を追加し、必要であればStoreのDispatchイベントを発行する.
+  void pushWithMerge<T>(
+    T newProperty, {
+    required TState Function(TState state, T value) merge,
+    bool forceMerge = false,
+  }) {
+    push<T>(newProperty, merge: merge);
+    final store = this.store;
+    if (forceMerge || store?.hasActions() == false) {
+      // 実行中のActionがなければマージを促す
+      store?.dispatch(MultiSourceReduxAction.merge());
+    }
   }
 }
