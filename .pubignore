@@ -1,0 +1,10 @@
+scripts/
+.vscode/
+.github/
+*.gradle
+gradle/
+flutter_env.yaml
+cspell.json
+build/
+gradlew
+gradlew.bat

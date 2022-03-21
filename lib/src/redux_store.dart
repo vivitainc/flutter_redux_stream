@@ -255,6 +255,6 @@ class ReduxStore<TState extends ReduxState> {
 class _FinalizeAction<TState extends ReduxState> extends ReduxAction<TState> {
   @override
   Stream<TState> execute(TState state) async* {
-    store._notifier.dispose();
+    await store._notifier.dispose();
   }
 }
