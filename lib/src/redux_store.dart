@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 
-import 'package:async_plus/async_plus.dart';
+import 'package:async_notify/async_notify.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:stdlib_plus/stdlib_plus.dart';
 
 import 'experimental/redux_action_hook.dart';
 import 'internal/logger.dart';
@@ -156,7 +156,7 @@ class ReduxStore<TState extends ReduxState> {
       })
       ..clear();
     await _notifyEvent.close();
-    _dispatcher.dispose();
+    await _dispatcher.dispose();
     await _state.close();
 
     if (_stateDispose != null) {
@@ -172,7 +172,7 @@ class ReduxStore<TState extends ReduxState> {
   /// 指定型のPluginが見つからない場合、このメソッドは例外を投げる.
   TPlugin plugin<TPlugin>() {
     final itr = _pluginList.whereType<TPlugin>();
-    check(itr.isNotEmpty, () => 'Invalid Plugin<$TPlugin>');
+    assert(itr.isNotEmpty, 'Invalid Plugin<$TPlugin>');
     return itr.first;
   }
 
@@ -207,7 +207,7 @@ class ReduxStore<TState extends ReduxState> {
   TPlugin wherePlugin<TPlugin>(
       bool Function(ReduxPlugin<TState> element) test) {
     final itr = _pluginList.where(test).whereType<TPlugin>();
-    check(itr.isNotEmpty, () => 'Invalid Plugin<$TPlugin>');
+    assert(itr.isNotEmpty, 'Invalid Plugin<$TPlugin>');
     return itr.first;
   }
 

@@ -1,5 +1,3 @@
-import 'package:stdlib_plus/stdlib_plus.dart';
-
 import '../redux_store.dart';
 
 /// ReduxActionの事後に処理を差し込む.
@@ -8,7 +6,7 @@ import '../redux_store.dart';
 /// 例えば、生成されたStateを正規化する等の調整に使用する。
 ///
 /// 非常に強力であるため、設計上は `Plugin` や `Action` 側で効率的に行えない処理だけに留めること.
-abstract class ReduxActionHook<TState extends ReduxState> extends Disposable {
+abstract class ReduxActionHook<TState extends ReduxState> {
   /// StoreへHookが登録された.
   void onRegistered(ReduxStore<TState> store) {}
 
@@ -26,4 +24,6 @@ abstract class ReduxActionHook<TState extends ReduxState> extends Disposable {
   /// Storeから登録解除された
   /// dispose()の直前にも呼び出される.
   void onUnregistered(ReduxStore<TState> store) {}
+
+  Future dispose();
 }

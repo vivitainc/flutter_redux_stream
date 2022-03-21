@@ -12,8 +12,7 @@ class ReduxBackgroundTaskPlugin<TState extends ReduxState>
     _taskList.add(task);
   }
 
-  @override
-  void dispose() {
+  Future dispose() async {
     _gc(all: true);
   }
 

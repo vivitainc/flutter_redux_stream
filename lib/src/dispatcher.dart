@@ -9,7 +9,7 @@ part of 'redux_store.dart';
 /// 一度execute()が発行されたActionは最後まで実行する権利を得る.
 /// 内部で発生した [CancellationException] のタイミングに寄ってStateが不定になるのを防ぐため、
 /// Actionは必ず正常終了しなければならない.
-class Dispatcher<TState extends ReduxState> implements Disposable {
+class Dispatcher<TState extends ReduxState> {
   final Notify _notify;
 
   /// 実行対象のAction
@@ -74,7 +74,8 @@ class Dispatcher<TState extends ReduxState> implements Disposable {
             }
           } on Exception catch (e, stack) {
             logError('abort execute: $action', e, stack);
-            if (kDebugMode && !Environments.isFlutterTesting) {
+            if (kDebugMode &&
+                !Platform.environment.containsKey('FLUTTER_TEST')) {
               logInfo(
                   '========================= Inspect ReduxStore<$TState> =========================');
               developer.inspect(store.state);
@@ -106,6 +107,5 @@ class Dispatcher<TState extends ReduxState> implements Disposable {
     }
   }
 
-  @override
-  void dispose() {}
+  Future dispose() async {}
 }

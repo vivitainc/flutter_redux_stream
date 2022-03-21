@@ -1,14 +1,11 @@
-import 'package:stdlib_plus/stdlib_plus.dart';
-
 import 'redux_store.dart';
 
 /// Redux Storeの各種タイミングでハンドリングを行う.
 ///
 /// Actionとは違い、非同期処理やStateを変更することはできない.
 /// ReduxStore.dispose()の呼び出し時にReduxPlugin.dispose()が実行される.
-abstract class ReduxPlugin<TState extends ReduxState> implements Disposable {
-  /// StoreへPluginが登録された.
-  void onRegistered(ReduxStore<TState> store) {}
+abstract class ReduxPlugin<TState extends ReduxState> {
+  Future dispose();
 
   /// StoreへDispatch命令が発行された.
   ///
@@ -21,6 +18,9 @@ abstract class ReduxPlugin<TState extends ReduxState> implements Disposable {
     ReduxAction<TState> action,
     TState state,
   ) {}
+
+  /// StoreへPluginが登録された.
+  void onRegistered(ReduxStore<TState> store) {}
 
   /// Stateが実際に反映されたタイミングで呼び出される.
   void onStateChanged(

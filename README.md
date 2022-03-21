@@ -1,8 +1,6 @@
-flutter_redux_stream
+redux_stream
 
-| CI / CD | ビルドステータス |
-|---|---|
-| Github Actions | [![Github Actions](https://github.com/vivitainc/flutter_redux_stream/actions/workflows/flutter-package-test.yaml/badge.svg)](https://github.com/vivitainc/flutter_redux_stream/actions/workflows/flutter-package-test.yaml) |
+[![Github Actions](https://github.com/vivitainc/flutter_redux_stream/actions/workflows/flutter-package-test.yaml/badge.svg)](https://github.com/vivitainc/flutter_redux_stream/actions/workflows/flutter-package-test.yaml)
 
 ## Features
 
@@ -26,18 +24,9 @@ Reduxの処理がFutureではなくStreamで実装されており、Event等の�
 
 特性上データコピーが頻発するため、低スペック端末に対応する場合は十分に注意して実装すること.
 
-## Getting started
-
-TODO.
-
-```yaml
-# pubspec.yaml
-```
-
 ## Usage
 
 TODO.
 
 ```dart
 ```
-## Additional information

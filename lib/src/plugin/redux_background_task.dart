@@ -1,5 +1,3 @@
-import 'package:stdlib_plus/stdlib_plus.dart';
-
 import '../redux_store.dart';
 import 'redux_background_task_plugin.dart';
 
@@ -17,14 +15,15 @@ import 'redux_background_task_plugin.dart';
 ///
 /// 登録処理はActionとして行われるため、
 /// gcまでには最低でも1Actionイテレーションは稼働可能なことになる.
-abstract class ReduxBackgroundTask<TState extends ReduxState>
-    extends Disposable {
+abstract class ReduxBackgroundTask<TState extends ReduxState> {
   final ReduxStore<TState> store;
 
   ReduxBackgroundTask(this.store);
 
   /// 動作を完了したらtrue.
   bool get done;
+
+  Future dispose();
 
   /// BackgroundTaskの処理を開始させる
   void onStart(TState state);

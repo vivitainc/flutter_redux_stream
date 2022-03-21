@@ -30,8 +30,8 @@ class MultiSourceBufferPlugin<TState extends ReduxState>
   }
 
   @override
-  void dispose() {
-    _subscription.dispose();
+  Future dispose() async {
+    return _subscription.dispose();
   }
 
   @override

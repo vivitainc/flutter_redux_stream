@@ -22,6 +22,16 @@ class NotifyReduxPropertyPlugin<TState extends ReduxState, T>
   }
 
   @override
+  Future dispose() async {
+    for (final pending in _pendingNotifier) {
+      await pending.notifier.dispose();
+    }
+    for (final notifier in _notifierList) {
+      await notifier.dispose();
+    }
+  }
+
+  @override
   void onRegistered(ReduxStore<TState> store) {
     _refreshNotifiers(store.state);
   }
@@ -36,16 +46,6 @@ class NotifyReduxPropertyPlugin<TState extends ReduxState, T>
     _refreshNotifiers(oldState);
     for (final notifier in _notifierList) {
       notifier.onStateChanged(newState);
-    }
-  }
-
-  @override
-  void dispose() {
-    for (final pending in _pendingNotifier) {
-      pending.notifier.dispose();
-    }
-    for (final notifier in _notifierList) {
-      notifier.dispose();
     }
   }
 

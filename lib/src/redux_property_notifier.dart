@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:stdlib_plus/stdlib_plus.dart';
 
 import 'plugin/notify_redux_property_plugin.dart';
 import 'redux_store.dart';
 
 /// ReduxStateの特定プロパティが変更された際のハンドリングを行う.
-class ReduxPropertyNotifier<TState extends ReduxState, T>
-    implements Disposable {
+class ReduxPropertyNotifier<TState extends ReduxState, T> {
   /// 最後に受け取ったState
   TState? _latestState;
 
@@ -49,7 +47,7 @@ class ReduxPropertyNotifier<TState extends ReduxState, T>
   final bool Function(T? a, T? b) equals;
 
   /// onDispose.
-  final Function(TState state, T? property)? _onDispose;
+  final Future Function(TState state, T? property)? _onDispose;
 
   ReduxPropertyNotifier({
     required this.selector,
@@ -72,7 +70,7 @@ class ReduxPropertyNotifier<TState extends ReduxState, T>
     void Function(TState newState)? onPropertyCleared,
 
     /// 解放コールバック
-    void Function(TState state, T? property)? onDispose,
+    Future Function(TState state, T? property)? onDispose,
   })  : equals = equals ?? ReduxPropertyNotifier.propertyEquals,
         _onPropertyCreated = onPropertyCreated,
         _onPropertyChangedWithState = onPropertyChangedWithState,
@@ -80,9 +78,8 @@ class ReduxPropertyNotifier<TState extends ReduxState, T>
         _onPropertyCleared = onPropertyCleared,
         _onDispose = onDispose;
 
-  @override
-  void dispose() {
-    _onDispose?.call(_latestState!, _latestProperty);
+  Future dispose() async {
+    return _onDispose?.call(_latestState!, _latestProperty);
   }
 
   /// プロパティの更新ハンドリングを行う.

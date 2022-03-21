@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:stdlib_plus/stdlib_plus.dart';
 
 import 'internal/logger.dart';
 import 'redux_property_notifier.dart';
@@ -59,8 +58,10 @@ class StateProperty<TState extends ReduxState, T> extends StatefulWidget {
   }) : super(key: key) {
     final assertBuilderNum =
         (builder != null ? 1 : 0) + (builderWithState != null ? 1 : 0);
-    checkArgument(
-        assertBuilderNum == 1, 'Invalid [builder | builderWithState]');
+    assert(
+      assertBuilderNum == 1,
+      'Invalid [builder | builderWithState]',
+    );
   }
 
   @override
@@ -91,7 +92,7 @@ class _StatePropertyState<TState extends ReduxState, T>
         lastBuildProperty,
       );
     }
-    throw IllegalStateException('Invalid Builder');
+    throw Exception('Invalid Builder');
   }
 
   @override
