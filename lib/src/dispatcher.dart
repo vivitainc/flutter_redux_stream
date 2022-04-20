@@ -40,6 +40,9 @@ class Dispatcher<TState extends ReduxState> {
     return _channel.isNotEmpty || _current != null;
   }
 
+  /// 実行待ちのActionが存在する場合true
+  bool hasPendingActions() => _channel.isNotEmpty;
+
   Future _execute(ReduxStore<TState> store) async {
     logInfo('start dispatcher');
     try {
@@ -64,12 +67,15 @@ class Dispatcher<TState extends ReduxState> {
 
         // 処理が完了するまで取得
         action._state = _ActionState.execute;
+        final oldState = store.state;
+        var newState = oldState;
         try {
           try {
-            final stream = action.execute(store.state);
+            final stream = action.execute(oldState);
             var number = 0;
-            await for (final newState in stream) {
-              store._notify(action, number, newState);
+            await for (final received in stream) {
+              store._notify(action, number, received);
+              newState = received;
               ++number;
             }
           } on Exception catch (e, stack) {
@@ -88,7 +94,7 @@ class Dispatcher<TState extends ReduxState> {
             }
           }
         } finally {
-          store._notify(action, ReduxStateNotify._done, store.state);
+          store._notify(action, ReduxStateNotify._done, newState);
           action._state = _ActionState.done;
           _current = null;
           // 通知送信.

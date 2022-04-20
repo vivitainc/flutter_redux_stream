@@ -22,10 +22,11 @@ class MultiSourceBufferPlugin<TState extends ReduxState>
   /// StreamはReduxStoreのライフサイクル終了時に自動的に解放される.
   StreamSubscription<T> addStreamSource<T>(
     Stream<T> source,
-    TState Function(TState state, T value) merge,
-  ) {
+    TState Function(TState state, T value) merge, {
+    bool forceMerge = false,
+  }) {
     return _subscription.add(source.listen((event) {
-      pushWithMerge(event, merge: merge);
+      pushWithMerge(event, merge: merge, forceMerge: forceMerge);
     }));
   }
 
@@ -47,7 +48,7 @@ class MultiSourceBufferPlugin<TState extends ReduxState>
   }) {
     push<T>(newProperty, merge: merge);
     final store = this.store;
-    if (forceMerge || store?.hasActions() == false) {
+    if (forceMerge || store?.hasPendingActions() == false) {
       // 実行中のActionがなければマージを促す
       store?.dispatch(MultiSourceReduxAction.merge());
     }

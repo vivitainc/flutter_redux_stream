@@ -168,6 +168,8 @@ class ReduxStore<TState extends ReduxState> {
   /// 実行待ち、もしくは実行中のActionがあればtrueを返却する.
   bool hasActions() => _dispatcher.hasActions();
 
+  bool hasPendingActions() => _dispatcher.hasPendingActions();
+
   /// 指定Pluginを取得する.
   /// 指定型のPluginが見つからない場合、このメソッドは例外を投げる.
   TPlugin plugin<TPlugin>() {
