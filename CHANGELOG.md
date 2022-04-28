@@ -1,3 +1,7 @@
+## 0.2.0+3
+
+* Mod Loggingに簡易タグを追加
+
 ## 0.2.0+2
 
 * Fix MultiSourceBufferPlugin.

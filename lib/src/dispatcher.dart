@@ -44,7 +44,7 @@ class Dispatcher<TState extends ReduxState> {
   bool hasPendingActions() => _channel.isNotEmpty;
 
   Future _execute(ReduxStore<TState> store) async {
-    logInfo('start dispatcher');
+    logInfo('start Dispatcher<$TState>');
     try {
       while (true) {
         // 次に実行すべきActionを取得する
