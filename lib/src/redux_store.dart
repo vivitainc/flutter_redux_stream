@@ -57,13 +57,13 @@ class ReduxStore<TState extends ReduxState> {
   ///
   /// 更新回数や実行されたAction等も取得できる.
   /// この値はEventとして動作するため、Storeに保持されない.
-  Subject<ReduxStateNotify<TState>> get notifyEvent => _notifyEvent;
+  Stream<ReduxStateNotify<TState>> get notifyEvent => _notifyEvent;
 
   /// 現在のStateを取得する.
   TState get state => _state.value;
 
   /// StateをStreamとして取得する.
-  Subject<TState> get stateStream => _state;
+  Stream<TState> get stateStream => _state;
 
   /// Action実行をリクエストする.
   ///
@@ -233,7 +233,10 @@ class ReduxStore<TState extends ReduxState> {
     }
 
     // 正規化済みの値を書き込む.
-    _state.value = newState;
+    // NOTE. このとき、値が変動しなければ通知を行わない.
+    if (_state.value != newState) {
+      _state.value = newState;
+    }
     _notifyEvent.add(ReduxStateNotify._init(
       _notifyNumber,
       action,
