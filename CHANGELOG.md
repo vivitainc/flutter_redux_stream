@@ -1,3 +1,8 @@
+## 0.2.1
+
+* ReduxStore.stateStream()の通知が最小になるように最適化
+* ReduxStore.stateStreamをStreamを返却するように調整
+
 ## 0.2.0+3
 
 * Mod Loggingに簡易タグを追加
