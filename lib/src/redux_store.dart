@@ -26,6 +26,11 @@ class ReduxStore<TState extends ReduxState> {
 
   final BehaviorSubject<TState> _state;
 
+  /// レンダリング用に流通量を制限したStream.
+  BehaviorSubject<TState>? _renderState;
+
+  final _subscription = CompositeSubscription();
+
   final PublishSubject<ReduxStateNotify<TState>> _notifyEvent =
       PublishSubject();
 
@@ -42,15 +47,20 @@ class ReduxStore<TState extends ReduxState> {
   /// Initialを除き、データが更新されるタイミングで発行される.
   var _notifyNumber = 0;
 
+  final Duration _renderingInterval;
+
   /// 指定された初期値でReduxStoreを生成する.
   /// Stateの解放処理を明示的に記述したい場合、 [stateDispose] を設定する.
   ReduxStore({
     required TState initial,
     ReduxStateDispose<TState>? stateDispose,
+    Duration renderingInterval = const Duration(milliseconds: 1000 ~/ 60),
   })  : _stateDispose = stateDispose,
-        _state = BehaviorSubject.seeded(initial) {
+        _state = BehaviorSubject.seeded(initial),
+        _renderingInterval = renderingInterval {
     _dispatcher = Dispatcher(_notifier);
     _dispatcher._start(this);
+    _initializeRenderState(renderingInterval);
   }
 
   /// 更新タイミングで付加情報を取得する.
@@ -58,6 +68,20 @@ class ReduxStore<TState extends ReduxState> {
   /// 更新回数や実行されたAction等も取得できる.
   /// この値はEventとして動作するため、Storeに保持されない.
   Stream<ReduxStateNotify<TState>> get notifyEvent => _notifyEvent;
+
+  /// レンダリング用に流通量を制限したStreamを取得する.
+  /// [stateStream] は完全性を保証するが、このStreamはレンダリング用に間引きが行われるため、
+  /// 完全性を保証しない.
+  ///
+  /// 例えばデータが局所的に10000回 / 秒書き込まれた場合、
+  /// データストリームは全ての変更を通知するが、レンダリングストリームは16msに1回（以内)、最新値が通知される.
+  /// 完全なデータ管理には [stateStream] が必要であるが、Widget.build()の発行過多を防ぐためには
+  /// [renderStream] が適切である.
+  ///
+  /// 完全性が必要でなおかつ流通量制限が必要であれば、適宜 [stateStream] を操作する.
+  Stream<TState> get renderStream {
+    return _renderState ??= _initializeRenderState(_renderingInterval);
+  }
 
   /// 現在のStateを取得する.
   TState get state => _state.value;
@@ -157,6 +181,8 @@ class ReduxStore<TState extends ReduxState> {
       ..clear();
     await _notifyEvent.close();
     await _dispatcher.dispose();
+    await _subscription.dispose();
+    await _renderState?.close();
     await _state.close();
 
     if (_stateDispose != null) {
@@ -211,6 +237,18 @@ class ReduxStore<TState extends ReduxState> {
     final itr = _pluginList.where(test).whereType<TPlugin>();
     assert(itr.isNotEmpty, 'Invalid Plugin<$TPlugin>');
     return itr.first;
+  }
+
+  /// レンダリング用に流通量を制限したStreamを生成する.
+  BehaviorSubject<TState> _initializeRenderState(Duration renderingInterval) {
+    final result = BehaviorSubject<TState>.seeded(state);
+    _subscription.add(
+      Stream.periodic(
+        renderingInterval,
+        (computationCount) => state,
+      ).distinct().listen(result.add),
+    );
+    return result;
   }
 
   /// 新しいデータをStoreに反映させる

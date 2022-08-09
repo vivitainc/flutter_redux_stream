@@ -101,7 +101,7 @@ class _StatePropertyState<TState extends ReduxState, T>
     final store = widget.store ?? StoreProvider.of(context);
     lastBuildState = store.state;
     lastBuildProperty = select(lastBuildState);
-    subscribe ??= store.stateStream.listen(_listenState);
+    subscribe ??= store.renderStream.listen(_listenState);
   }
 
   @override

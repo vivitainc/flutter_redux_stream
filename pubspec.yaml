@@ -2,7 +2,7 @@ name: redux_stream
 description: |
   Redux Architecture for Flutter 2.0
   'redux_stream' library is Experimental.
-version: 0.2.1
+version: 0.2.2
 homepage: https://github.com/vivitainc/flutter_redux_stream
 
 environment:
