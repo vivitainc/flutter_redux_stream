@@ -1,3 +1,8 @@
+## 0.2.2
+
+* ReduxStore.stateStream(データ通知)とReduxStore.renderStream(レンダリング制御通知)を分離
+  * これにより更新がスパイクしてもRebuildが肥大化しないようになった
+
 ## 0.2.1
 
 * ReduxStore.stateStream()の通知が最小になるように最適化
