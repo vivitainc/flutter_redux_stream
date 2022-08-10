@@ -80,7 +80,11 @@ class ReduxStore<TState extends ReduxState> {
   ///
   /// 完全性が必要でなおかつ流通量制限が必要であれば、適宜 [stateStream] を操作する.
   Stream<TState> get renderStream {
-    return _renderState ??= _initializeRenderStream(_renderingInterval);
+    final result = _renderState ??= _initializeRenderStream(_renderingInterval);
+    if (result.value != state) {
+      result.add(state);
+    }
+    return result;
   }
 
   /// 現在のStateを取得する.
