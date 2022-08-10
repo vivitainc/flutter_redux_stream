@@ -60,7 +60,7 @@ class ReduxStore<TState extends ReduxState> {
         _renderingInterval = renderingInterval {
     _dispatcher = Dispatcher(_notifier);
     _dispatcher._start(this);
-    _initializeRenderState(renderingInterval);
+    _initializeRenderStream(renderingInterval);
   }
 
   /// 更新タイミングで付加情報を取得する.
@@ -80,7 +80,7 @@ class ReduxStore<TState extends ReduxState> {
   ///
   /// 完全性が必要でなおかつ流通量制限が必要であれば、適宜 [stateStream] を操作する.
   Stream<TState> get renderStream {
-    return _renderState ??= _initializeRenderState(_renderingInterval);
+    return _renderState ??= _initializeRenderStream(_renderingInterval);
   }
 
   /// 現在のStateを取得する.
@@ -240,7 +240,7 @@ class ReduxStore<TState extends ReduxState> {
   }
 
   /// レンダリング用に流通量を制限したStreamを生成する.
-  BehaviorSubject<TState> _initializeRenderState(Duration renderingInterval) {
+  BehaviorSubject<TState> _initializeRenderStream(Duration renderingInterval) {
     final result = BehaviorSubject<TState>.seeded(state);
     _subscription.add(
       Stream.periodic(
