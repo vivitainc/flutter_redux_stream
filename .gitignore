@@ -29,3 +29,4 @@
 build/
 
 .gradle/
+.fvm/flutter_sdk

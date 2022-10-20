@@ -46,4 +46,5 @@
     ],
     "cSpell.diagnosticLevel": "Error",
     "cSpell.enabled": true,
+    "dart.flutterSdkPath": ".fvm/fluter_sdk",
 }
