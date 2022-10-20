@@ -21,9 +21,9 @@ val pubspec = (org.yaml.snakeyaml.Yaml().load(file("pubspec.yaml").readText()) a
  * Flutter executable
  */
 val flutterExe = if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    "flutter.bat"
+    "fvm"
 } else {
-    "flutter"
+    "fvm"
 }
 
 /**
@@ -62,7 +62,7 @@ task("flutterPubUpgrade") {
             workingDir = projectDir
             executable = flutterExe
             args = listOf(
-                listOf("pub", "upgrade"),
+                listOf("flutter", "pub", "upgrade"),
                 if(rootProject.properties["flutter.offline"] != null) {
                     listOf("--offline")
                 } else {
@@ -81,7 +81,7 @@ task("flutterPubOutdated") {
         exec {
             workingDir = projectDir
             executable = flutterExe
-            args = listOf("pub", "outdated")
+            args = listOf("flutter", "pub", "outdated")
         }
     }
 }
@@ -97,20 +97,10 @@ task("flutterValidateFormat") {
             ".g.dart"
         )
         println("package(${project.name}): validate / $flutterExe format file")
-        val output = ByteArrayOutputStream()
         exec {
             workingDir = projectDir
             executable = flutterExe
-            args = listOf("format", "lib")
-            standardOutput = output
-        }
-
-        // Support: Flutter 2.5.0 or greater.
-        output.toByteArray().toString(Charset.defaultCharset()).also { stdout ->
-            if (!stdout.contains("(0 changed)")) {
-                println(stdout)
-                throw GradleException("Unformatted *.dart")
-            }
+            args = listOf("flutter", "format", "lib", "--set-exit-if-changed", "--dry-run")
         }
     }
 }
@@ -123,7 +113,7 @@ task("flutterFormat") {
         exec {
             workingDir = projectDir
             executable = flutterExe
-            args = listOf("format", "lib")
+            args = listOf("flutter", "format", "lib")
         }
     }
 }
@@ -136,7 +126,7 @@ task("flutterAnalyze") {
         exec {
             workingDir = projectDir
             executable = flutterExe
-            args = listOf("analyze")
+            args = listOf("flutter", "analyze")
         }
     }
 }
@@ -153,7 +143,7 @@ task("flutterTest") {
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf(listOf("test"), loadFlutterArguments("unit_test"), listOf("test/")).flatten()
+                args = listOf(listOf("flutter", "test"), loadFlutterArguments("unit_test"), listOf("test/")).flatten()
             }
         }
         if (project.fileTree("flutter_test").find { it.extension == "dart" } != null) {
@@ -161,7 +151,7 @@ task("flutterTest") {
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf(listOf("test"), loadFlutterArguments("unit_test"), listOf("flutter_test/")).flatten()
+                args = listOf(listOf("flutter", "test"), loadFlutterArguments("unit_test"), listOf("flutter_test/")).flatten()
             }
         }
     }
@@ -193,12 +183,12 @@ task("flutterBuildRunner") {
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf("pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
+                args = listOf("flutter", "pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
             }
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf("format", "lib")
+                args = listOf("flutter", "format", "lib")
             }
         }
         if (flutter_intl?.get("enabled") == true) {
@@ -206,12 +196,12 @@ task("flutterBuildRunner") {
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf("pub", "run", "intl_utils:generate")
+                args = listOf("flutter", "pub", "run", "intl_utils:generate")
             }
             exec {
                 workingDir = projectDir
                 executable = flutterExe
-                args = listOf("format", "lib")
+                args = listOf("flutter", "format", "lib")
             }
         }
     }
