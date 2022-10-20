@@ -36,8 +36,7 @@ class StatePropertyNotify<TState extends ReduxState, T> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StatePropertyNotifyState createState() =>
-      _StatePropertyNotifyState<TState, T>();
+  State createState() => _StatePropertyNotifyState<TState, T>();
 }
 
 class _StatePropertyNotifyState<TState extends ReduxState, T>
