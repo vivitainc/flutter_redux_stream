@@ -1,2 +1,0 @@
-# Cache control on Github Actions.
-v1.0

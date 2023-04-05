@@ -4,49 +4,37 @@
         {
             "label": "flutter > clean",
             "type": "shell",
-            "command": "./gradlew --parallel --stacktrace  flutterCacheClean flutterClean",
+            "command": "fvm flutter clean",
             "problemMatcher": []
         },
         {
-            "label": "flutter > pub upgrade",
+            "label": "flutter > pub get",
             "type": "shell",
-            "command": "./gradlew --stacktrace flutterPubUpgrade",
-            "problemMatcher": []
-        },
-        {
-            "label": "flutter > pub upgrade(--offline)",
-            "type": "shell",
-            "command": "./gradlew --stacktrace -Pflutter.offline flutterPubUpgrade",
+            "command": "fvm flutter pub get",
             "problemMatcher": []
         },
         {
             "label": "flutter > format",
             "type": "shell",
-            "command": "./gradlew --parallel --stacktrace  flutterFormat",
+            "command": "fvm flutter format .",
             "problemMatcher": []
         },
         {
             "label": "flutter > analyze",
             "type": "shell",
-            "command": "./gradlew --parallel --stacktrace flutterAnalyze",
+            "command": "fvm flutter analyze .",
             "problemMatcher": []
         },
         {
             "label": "flutter > build runner",
             "type": "shell",
-            "command": "./gradlew --stacktrace flutterBuildRunner",
-            "problemMatcher": []
-        },
-        {
-            "label": "flutter > compile proto3",
-            "type": "shell",
-            "command": "./gradlew --parallel --stacktrace flutterCompileProto3",
+            "command": "fvm flutter pub run build_runner build --delete-conflicting-outputs",
             "problemMatcher": []
         },
         {
             "label": "flutter > Run Unit Test",
             "type": "shell",
-            "command": "./gradlew flutterTest",
+            "command": "fvm flutter test flutter_test/",
             "problemMatcher": [],
         },
     ]

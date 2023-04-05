@@ -1,1 +1,0 @@
-apply from: "scripts/flutter-package.gradle.kts"
