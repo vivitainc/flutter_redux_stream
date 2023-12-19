@@ -108,7 +108,7 @@ class ReduxStore<TState extends ReduxState> {
   TState get state => _state.value;
 
   /// StateをStreamとして取得する.
-  Stream<TState> get stateStream => _state;
+  Stream<TState> get stateStream => _state.where((event) => isNotDisposed);
 
   /// Action実行をリクエストする.
   ///
@@ -228,7 +228,7 @@ class ReduxStore<TState extends ReduxState> {
       Stream.periodic(
         renderingInterval,
         (computationCount) => state,
-      ).distinct().listen(result.add),
+      ).distinct().where((event) => isNotDisposed).listen(result.add),
     );
     return result;
   }
