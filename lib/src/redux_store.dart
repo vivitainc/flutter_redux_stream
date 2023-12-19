@@ -77,6 +77,9 @@ class ReduxStore<TState extends ReduxState> {
   /// ただし、破棄済みであっても完全に処理が終了していない場合がある.
   bool get isDisposed => _disposed;
 
+  /// このStoreが有効である場合にtrueを返却する.
+  bool get isNotDisposed => !isDisposed;
+
   /// 更新タイミングで付加情報を取得する.
   ///
   /// 更新回数や実行されたAction等も取得できる.
