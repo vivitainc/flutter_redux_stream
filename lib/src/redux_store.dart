@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:async_notify/async_notify.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'experimental/redux_action_hook.dart';
 import 'internal/logger.dart';
 import 'redux_plugin.dart';
 
@@ -43,14 +41,15 @@ class ReduxStore<TState extends ReduxState> {
 
   final List<ReduxPlugin<TState>> _pluginList = [];
 
-  final List<ReduxActionHook<TState>> _hookList = [];
-
   /// State解放関数
   final ReduxStateDispose<TState>? _stateDispose;
 
   /// 通知番号
   /// Initialを除き、データが更新されるタイミングで発行される.
   var _notifyNumber = 0;
+
+  /// 破棄済みチェックフラグ
+  var _disposed = false;
 
   final Duration _renderingInterval;
 
@@ -71,6 +70,12 @@ class ReduxStore<TState extends ReduxState> {
     _dispatcher._start(this);
     _initializeRenderStream(renderingInterval);
   }
+
+  /// このStoreが破棄済みであるかどうかを取得する.
+  /// trueを返却するとき、もうActionを行うことはできない.
+  ///
+  /// ただし、破棄済みであっても完全に処理が終了していない場合がある.
+  bool get isDisposed => _disposed;
 
   /// 更新タイミングで付加情報を取得する.
   ///
@@ -106,6 +111,10 @@ class ReduxStore<TState extends ReduxState> {
   ///
   /// この処理はFire & Forgetのため、終了を待ち合わせることはできない.
   void dispatch(ReduxAction<TState> action) {
+    if (_disposed) {
+      throw CancellationException('ReduxStore<$TState> is disposed');
+    }
+
     action._store = this;
     for (final element in _pluginList) {
       element.onDispatch(this, action, state);
@@ -120,43 +129,12 @@ class ReduxStore<TState extends ReduxState> {
   /// async funcにすると実行タイミングにズレが生じるため、
   /// 即時実行 + 非同期関数として動作する.
   Future<TState> dispatchAndResult(ReduxAction<TState> action) {
-    final future = () async {
-      await for (final notify in notifyEvent) {
-        if (notify.action != action) {
-          continue;
-        }
-        if (notify.done) {
-          // logInfo('done dispatchAndResult($action)');
-          return notify.newState;
-        }
-      }
-      throw CancellationException('.notifyEvent canceled: $action');
-    }();
+    final task = notifyEvent
+        .where((event) => event.action == action && event.done)
+        .map((event) => event.newState)
+        .first;
     dispatch(action);
-    return future;
-  }
-
-  /// Action実行をリクエストし、値取得用のStream<TState>を返却する.
-  /// Actionの実行に合わせてStreamに通知され、Action終了時にStreamがcloseされる.
-  ///
-  /// MEMO:
-  /// async funcにすると実行タイミングにズレが生じるため、
-  /// 即時実行 + 非同期関数として動作する.
-  Stream<TState> dispatchAndStream(ReduxAction<TState> action) {
-    final Stream<TState> stream = () async* {
-      await for (final notify in notifyEvent) {
-        if (notify.action != action) {
-          continue;
-        }
-        yield notify.newState;
-        if (notify.done) {
-          break;
-        }
-      }
-      // logInfo('close dispatchAndStream($action)');
-    }();
-    dispatch(action);
-    return stream;
+    return task;
   }
 
   /// Storeの終了処理を行う
@@ -167,6 +145,10 @@ class ReduxStore<TState extends ReduxState> {
   /// その後終了処理が実行される.
   @mustCallSuper
   Future dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     dispatch(_FinalizeAction());
     try {
       while (!_notifier.isClosed) {
@@ -179,13 +161,6 @@ class ReduxStore<TState extends ReduxState> {
 
     final latestState = state;
     _pluginList
-      ..forEach((element) {
-        element
-          ..onUnregistered(this)
-          ..dispose();
-      })
-      ..clear();
-    _hookList
       ..forEach((element) {
         element
           ..onUnregistered(this)
@@ -227,15 +202,6 @@ class ReduxStore<TState extends ReduxState> {
     return itr.first;
   }
 
-  /// Hookを登録する.
-  /// Hook処理は強力なため、十分に利用可否を検討する必要がある.
-  void registerHook(ReduxActionHook<TState> hook) {
-    assert(!_hookList.contains(hook), 'hook is registered');
-
-    _hookList.add(hook);
-    hook.onRegistered(this);
-  }
-
   /// PluginをStoreへ登録する.
   void registerPlugin(ReduxPlugin<TState> plugin) {
     assert(!_pluginList.contains(plugin), 'plugin is registered');
@@ -274,14 +240,6 @@ class ReduxStore<TState extends ReduxState> {
 
     // Hookに値の正規化を行わせる.
     var newState = rawNewState;
-    for (final element in _hookList) {
-      newState = element.shouldStateChange(
-        this,
-        action,
-        oldState,
-        newState,
-      );
-    }
 
     // 正規化済みの値を書き込む.
     // NOTE. このとき、値が変動しなければ通知を行わない.

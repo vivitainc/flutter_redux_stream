@@ -20,13 +20,6 @@ abstract class ReduxAction<TState extends ReduxState> {
   @protected
   ReduxStore<TState> get store => _store;
 
-  /// Action内で別なActionを実行する.
-  /// 他のActionを使い回すなどの利用方法がある.
-  /// ただし、引数 [action] は使用済みとなるため、再利用はできない.
-  @Deprecated('replace to "interrupt()"')
-  Stream<TState> delegate(ReduxAction<TState> action, TState state) =>
-      interrupt(action, state);
-
   Stream<TState> execute(TState state);
 
   /// Action内で別なActionを割り込み実行する.
