@@ -148,8 +148,8 @@ class ReduxStore<TState extends ReduxState> {
     if (_disposed) {
       return;
     }
-    _disposed = true;
     dispatch(_FinalizeAction());
+    _disposed = true;
     try {
       while (!_notifier.isClosed) {
         await _notifier.wait();
