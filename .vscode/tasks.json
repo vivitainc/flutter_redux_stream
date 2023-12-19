@@ -16,7 +16,7 @@
         {
             "label": "flutter > format",
             "type": "shell",
-            "command": "fvm flutter format .",
+            "command": "fvm dart format .",
             "problemMatcher": []
         },
         {
