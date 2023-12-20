@@ -1,3 +1,7 @@
+## 0.4.1
+
+* Add: ReduxStoreのdisposeチェックプロパティを追加
+
 ## 0.3.0
 
 * Flutter 3.0.0対応

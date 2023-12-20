@@ -80,8 +80,7 @@ class Dispatcher<TState extends ReduxState> {
             }
           } on Exception catch (e, stack) {
             logError('abort execute: $action', e, stack);
-            if (kDebugMode &&
-                !Platform.environment.containsKey('FLUTTER_TEST')) {
+            if (kDebugMode) {
               logInfo(
                   '========================= Inspect ReduxStore<$TState> =========================');
               developer.inspect(store.state);
@@ -92,6 +91,7 @@ class Dispatcher<TState extends ReduxState> {
                 message: 'Action<${action.runtimeType}> broken',
               );
             }
+            rethrow;
           }
         } finally {
           store._notify(action, ReduxStateNotify._done, newState);
@@ -102,12 +102,8 @@ class Dispatcher<TState extends ReduxState> {
         }
       }
     } on Exception catch (e, stack) {
-      if (e is! CancellationException) {
-        logError('abort dispatcher: $store', e, stack);
-        rethrow;
-      } else {
-        logError('cancel dispatcher: $store', e, stack);
-      }
+      logError('abort dispatcher: $store', e, stack);
+      rethrow;
     } finally {
       logInfo('finish dispatcher: $store');
     }

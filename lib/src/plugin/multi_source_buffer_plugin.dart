@@ -48,9 +48,11 @@ class MultiSourceBufferPlugin<TState extends ReduxState>
   }) {
     push<T>(newProperty, merge: merge);
     final store = this.store;
-    if (forceMerge || store?.hasPendingActions() == false) {
+    if (store == null || store.isDisposed) {
+      return;
+    } else if (forceMerge || !store.hasPendingActions()) {
       // 実行中のActionがなければマージを促す
-      store?.dispatch(MultiSourceReduxAction.merge());
+      store.dispatch(MultiSourceReduxAction.merge());
     }
   }
 }

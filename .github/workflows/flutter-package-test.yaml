@@ -23,8 +23,8 @@ jobs:
           flutter pub get
       - name: "flutter / test / format"
         run: |
-          flutter format lib/ --set-exit-if-changed --dry-run
-          flutter format flutter_test/ --set-exit-if-changed --dry-run
+          dart format lib/ --set-exit-if-changed
+          dart format flutter_test/ --set-exit-if-changed
       - name: "flutter / test / analyze"
         run: |
           flutter analyze
