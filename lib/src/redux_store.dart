@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:async_notify/async_notify.dart';
 import 'package:flutter/foundation.dart';
+import 'package:runtime_assert/runtime_assert.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'internal/logger.dart';
@@ -114,9 +115,7 @@ class ReduxStore<TState extends ReduxState> {
   ///
   /// この処理はFire & Forgetのため、終了を待ち合わせることはできない.
   void dispatch(ReduxAction<TState> action) {
-    if (_disposed) {
-      throw CancellationException('ReduxStore<$TState> is disposed');
-    }
+    check(isNotDisposed, 'ReduxStore<$TState> is disposed');
 
     action._store = this;
     for (final element in _pluginList) {
@@ -132,9 +131,8 @@ class ReduxStore<TState extends ReduxState> {
   /// async funcにすると実行タイミングにズレが生じるため、
   /// 即時実行 + 非同期関数として動作する.
   Future<TState> dispatchAndResult(ReduxAction<TState> action) {
-    if (_disposed) {
-      throw CancellationException('ReduxStore<$TState> is disposed');
-    }
+    check(isNotDisposed, 'ReduxStore<$TState> is disposed');
+
     final task = notifyEvent
         .where((event) => identical(event.action, action) && event.done)
         .map((event) => event.newState)
@@ -151,9 +149,8 @@ class ReduxStore<TState extends ReduxState> {
   /// その後終了処理が実行される.
   @mustCallSuper
   Future dispose() async {
-    if (_disposed) {
-      return;
-    }
+    check(isNotDisposed, 'ReduxStore<$TState> is disposed');
+
     dispatch(_FinalizeAction());
     _disposed = true;
     try {
