@@ -1,3 +1,8 @@
+## 0.4.1+1
+
+* Fix: dispatchAndResult()の待ち合わせ中にクラッシュする場合がある問題を修正
+* Chg: 実行時のステートチェック方法を変更
+
 ## 0.4.1
 
 * Add: ReduxStoreのdisposeチェックプロパティを追加
