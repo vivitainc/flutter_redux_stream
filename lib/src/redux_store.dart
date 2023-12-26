@@ -132,8 +132,11 @@ class ReduxStore<TState extends ReduxState> {
   /// async funcにすると実行タイミングにズレが生じるため、
   /// 即時実行 + 非同期関数として動作する.
   Future<TState> dispatchAndResult(ReduxAction<TState> action) {
+    if (_disposed) {
+      throw CancellationException('ReduxStore<$TState> is disposed');
+    }
     final task = notifyEvent
-        .where((event) => event.action == action && event.done)
+        .where((event) => identical(event.action, action) && event.done)
         .map((event) => event.newState)
         .first;
     dispatch(action);
